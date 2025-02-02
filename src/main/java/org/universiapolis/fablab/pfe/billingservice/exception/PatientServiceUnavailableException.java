@@ -1,7 +1,7 @@
 package org.universiapolis.fablab.pfe.billingservice.exception;
 
-public class ServiceUnavailableException extends RuntimeException {
-    public ServiceUnavailableException(String message) {
+public class PatientServiceUnavailableException extends RuntimeException {
+    public PatientServiceUnavailableException(String message) {
         super(message);
     }
 }
