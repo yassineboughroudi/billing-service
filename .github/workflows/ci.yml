@@ -48,5 +48,5 @@ jobs:
       # 7. (Optional) Tag and push 'latest'
       - name: Tag and Push 'latest'
         run: |
-          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/my-service:latest
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:latest
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:latest
