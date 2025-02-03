@@ -116,4 +116,13 @@ public class BillingService {
                 .status(invoice.getStatus().toString())
                 .build();
     }
+
+    // Get all invoices and convert them to InvoiceResponse DTOs
+    public List<InvoiceResponse> getAllInvoices() {
+        List<Invoice> invoices = invoiceRepository.findAll();
+        return invoices.stream()
+                .map(this::convertToInvoiceResponse)
+                .collect(Collectors.toList());
+    }
+
 }

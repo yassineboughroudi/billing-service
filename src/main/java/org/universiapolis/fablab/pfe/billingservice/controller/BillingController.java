@@ -43,6 +43,13 @@ public class BillingController {
     public ResponseEntity<List<InvoiceResponse>> getInvoicesByPatient(@PathVariable Long patientId) {
         return ResponseEntity.ok(billingService.getInvoicesByPatient(patientId));
     }
+    @GetMapping("/all")
+    @Operation(summary = "Get all invoices")
+    public ResponseEntity<List<InvoiceResponse>> getAllInvoices() {
+        List<InvoiceResponse> invoices = billingService.getAllInvoices();
+        return ResponseEntity.ok(invoices);
+    }
+
 
     @PostMapping("/invoices/{id}/pay")
     @Operation(summary = "Pay an invoice")
