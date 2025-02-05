@@ -4,14 +4,20 @@
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
 
-# Copy Maven/Gradle wrapper and config
+# Install Maven (only if necessary)
+RUN apk add --no-cache maven
+
+# Copy Maven wrapper and configuration
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
+
+# Download dependencies first for better caching
+RUN ./mvnw dependency:go-offline
 
 # Copy the source code
 COPY src ./src
 
-# Build the application (skip tests if you prefer fast builds)
+# Build the application (skip tests for faster builds)
 RUN ./mvnw clean package -DskipTests
 
 # ----------------------------
@@ -20,32 +26,14 @@ RUN ./mvnw clean package -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Expose the port used by the service (change as appropriate)
-# e.g., 8086 for billing, 8083 for scheduling, etc.
+# Expose the service's port
 EXPOSE 8080
 
 # Copy the built .jar from the build stage
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/billing-service-0.0.1-SNAPSHOT.jar app.jar
+
+# Ensure the JAR file has execution permissions
+RUN chmod +x /app/app.jar
 
 # Run the application
-ENTRYPOINT ["java","-jar","/app/app.jar"]
-
-
-
-
-## Use an OpenJDK image as the base image
-#FROM openjdk:17-jdk-slim
-#
-## Set the working directory
-#WORKDIR /app
-#
-## Copy the built JAR file into the container
-#COPY target/billing-service-0.0.1-SNAPSHOT.jar billing-service.jar
-#
-## Expose the service's port
-#EXPOSE 8086
-#
-## Set the command to run the application
-#ENTRYPOINT ["java", "-jar", "billing-service.jar"]
-
-
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]

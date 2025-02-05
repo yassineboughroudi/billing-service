@@ -33,8 +33,7 @@ public class BillingService {
     private final EventPublisherService eventPublisher;
 
     private void validatePatient(Long patientId) {
-        // Change from port 8086 to port 8082
-        String patientServiceUrl = "http://patient-management-service:8082/api/patients/" + patientId;
+        String patientServiceUrl = "http://patient-management-service:8080/api/patients/" + patientId;
         try {
             ResponseEntity<Void> response = restTemplate.getForEntity(patientServiceUrl, Void.class);
             if (response.getStatusCode() == HttpStatus.NOT_FOUND) {
@@ -46,6 +45,7 @@ public class BillingService {
             throw new PatientServiceUnavailableException("Patient service is unavailable");
         }
     }
+
 
 
     // Create an invoice using InvoiceRequest DTO
