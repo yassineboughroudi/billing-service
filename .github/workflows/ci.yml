@@ -15,25 +15,32 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      # 2. Set up JDK 17 (Temurin is an OpenJDK distribution)
+      # 2. Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # 3. Run unit and integration tests
-      - name: Run Unit & Integration Tests
+      # 3. Run tests with JaCoCo coverage
+      - name: Run Tests & Generate JaCoCo Report
         run: |
           chmod +x mvnw
           ./mvnw clean test verify
 
-      # 4. Build with Maven (without skipping tests)
+      # 4. Upload JaCoCo coverage report as an artifact
+      - name: Upload JaCoCo Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
+
+      # 5. Build with Maven (without skipping tests)
       - name: Build with Maven
         run: |
           ./mvnw clean package
 
-      # 5. Log in to Docker Hub (store DOCKERHUB_USERNAME & DOCKERHUB_PASSWORD as GitHub secrets)
+      # 6. Log in to Docker Hub
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
@@ -41,17 +48,17 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      # 6. Build Docker image (tag it with the commit SHA for uniqueness)
+      # 7. Build Docker image
       - name: Build Docker Image
         run: |
           docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:${{ github.sha }} .
 
-      # 7. Push Docker image (commit SHA tag)
+      # 8. Push Docker image
       - name: Push Docker Image
         run: |
           docker push ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:${{ github.sha }}
 
-      # 8. (Optional) Tag and push 'latest'
+      # 9. (Optional) Tag and push 'latest'
       - name: Tag and Push 'latest'
         run: |
           docker tag ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:${{ github.sha }} ${{ secrets.DOCKERHUB_USERNAME }}/billing-service:latest
